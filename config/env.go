@@ -32,6 +32,7 @@ func LoadConfigs(path string) (Config, error) {
 	viper.SetConfigType("env")
 
 	viper.AutomaticEnv()
+	viper.AutomaticEnv()
 
 	if viper.GetString(EnvKey) == "" {
 
