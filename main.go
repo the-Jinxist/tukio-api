@@ -23,6 +23,7 @@ func main() {
 		port = "3000"
 	}
 	http.ListenAndServe(fmt.Sprintf(":%s", port), r)
+	fmt.Printf("running on port: %s", port)
 
 }
 
