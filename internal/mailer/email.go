@@ -1,7 +1,6 @@
 package mailer
 
 import (
-	"bytes"
 	"fmt"
 
 	"net/smtp"
@@ -14,8 +13,6 @@ func SendEmail(toEmail, subject string, templateName string, templateVar interfa
 	smtpHost := "smtp.gmail.com"
 	smtpPort := "587"
 
-	var body bytes.Buffer
-
 	fromEmail := viper.GetString(config.FromEmailKey)
 	fromPassword := viper.GetString(config.FromPasswordKey)
 	auth := smtp.PlainAuth("", fromEmail, fromPassword, smtpHost)
@@ -27,16 +24,13 @@ func SendEmail(toEmail, subject string, templateName string, templateVar interfa
 	// 	return err
 	// }
 
-	mimeHeaders := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
-	body.Write([]byte(fmt.Sprintf("Subject: %s\n%s\n\n", subject, mimeHeaders)))
-
 	// if err = t.Execute(&body, templateVar); err != nil {
 	// 	return err
 	// }
 
 	addr := smtpHost + ":" + smtpPort
 
-	err := smtp.SendMail(addr, auth, fromEmail, []string{toEmail}, body.Bytes())
+	err := smtp.SendMail(addr, auth, fromEmail, []string{toEmail}, []byte(fmt.Sprintf("Subject: %s", subject)))
 	if err != nil {
 		fmt.Println(err)
 		return err

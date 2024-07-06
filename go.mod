@@ -2,15 +2,20 @@ module github.com/the-Jinxist/tukio-api
 
 go 1.21.6
 
-require github.com/spf13/viper v1.19.0
+require (
+	github.com/go-playground/validator/v10 v10.22.0
+	github.com/gofrs/uuid v4.4.0+incompatible
+	github.com/golang-jwt/jwt/v5 v5.2.1
+	github.com/pquerna/otp v1.4.0
+	github.com/spf13/viper v1.19.0
+	github.com/thedevsaddam/renderer v1.2.0
+)
 
 require (
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator/v10 v10.22.0 // indirect
-	github.com/gofrs/uuid v4.4.0+incompatible // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgio v1.0.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
@@ -18,8 +23,6 @@ require (
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/jackc/pgtype v1.14.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
-	github.com/pquerna/otp v1.4.0 // indirect
-	github.com/thedevsaddam/renderer v1.2.0 // indirect
 	golang.org/x/crypto v0.21.0 // indirect
 	golang.org/x/net v0.23.0 // indirect
 	gopkg.in/yaml.v2 v2.2.2 // indirect
@@ -27,7 +30,7 @@ require (
 
 require (
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
-	github.com/go-chi/chi/v5 v5.0.14 // indirect
+	github.com/go-chi/chi/v5 v5.0.14
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/jackc/pgconn v1.14.3
 	github.com/jackc/pgx/v4 v4.18.3

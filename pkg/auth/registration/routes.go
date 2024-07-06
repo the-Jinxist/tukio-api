@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/the-Jinxist/tukio-api/middleware"
 )
 
 func Routes(db *sql.DB) http.Handler {
@@ -14,6 +15,7 @@ func Routes(db *sql.DB) http.Handler {
 
 	r := chi.NewRouter()
 	r.Post("/", h.register)
+	r.With(middleware.VerifyCodeAuthenticator).Post("/verify_auth", h.verifyCode)
 
 	return r
 }

@@ -3,8 +3,12 @@
 CREATE TABLE IF NOT EXISTS "users" (
   "id" uuid PRIMARY KEY,
   "email" varchar,
+  "password" varchar,
+  "verified" boolean,
   "created_at" timestamp
 );
+
+CREATE UNIQUE INDEX idx_users_email ON users (email);
 
 CREATE TABLE IF NOT EXISTS "profiles" (
   "id" uuid PRIMARY KEY,
@@ -21,7 +25,7 @@ CREATE TABLE IF NOT EXISTS "profiles" (
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE IF EXISTS "users";
 DROP TABLE IF EXISTS "profiles";
+DROP TABLE IF EXISTS "users";
 
 -- +goose StatementEnd
