@@ -67,6 +67,7 @@ func (r RegistrationRepo) emailExists(ctx context.Context, email string) bool {
 	}
 
 	res.Next()
+	defer res.Close()
 	err = res.Scan(&exists)
 	if err != nil {
 		return true
@@ -85,6 +86,8 @@ func (r RegistrationRepo) phoneExists(ctx context.Context, phoneNumber string) b
 	}
 
 	res.Next()
+	defer res.Close()
+
 	err = res.Scan(&exists)
 	if err != nil {
 		return true

@@ -88,7 +88,7 @@ func Authenticator(next http.Handler) http.Handler {
 			return
 		}
 
-		if claims["token_id"] != "verify_otp" {
+		if claims["token_id"] != "auth" {
 			rnd.JSON(w, http.StatusUnauthorized, pkg.GenericResponse{
 				Message: "you are unauthorized to access this endpoint",
 				Status:  "error",
