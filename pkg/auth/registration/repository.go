@@ -5,6 +5,7 @@ import (
 	"database/sql"
 
 	"github.com/gofrs/uuid"
+	"github.com/jmoiron/sqlx"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -18,10 +19,10 @@ type repo interface {
 }
 
 type RegistrationRepo struct {
-	db *sql.DB
+	db *sqlx.DB
 }
 
-func NewRepo(db *sql.DB) repo {
+func NewRepo(db *sqlx.DB) repo {
 	return RegistrationRepo{
 		db: db,
 	}

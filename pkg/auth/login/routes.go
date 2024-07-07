@@ -1,15 +1,17 @@
 package login
 
 import (
-	"database/sql"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/jmoiron/sqlx"
 )
 
-func Routes(db *sql.DB) http.Handler {
+func Routes(db *sqlx.DB) http.Handler {
 
-	h := handler{}
+	repo := NewRepo(db)
+	svc := NewService(repo)
+	h := NewHandler(svc)
 
 	r := chi.NewRouter()
 	r.Post("/", h.login)

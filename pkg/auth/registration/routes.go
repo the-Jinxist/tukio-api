@@ -1,14 +1,14 @@
 package registration
 
 import (
-	"database/sql"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/jmoiron/sqlx"
 	"github.com/the-Jinxist/tukio-api/middleware"
 )
 
-func Routes(db *sql.DB) http.Handler {
+func Routes(db *sqlx.DB) http.Handler {
 	repo := NewRepo(db)
 	svc := NewService(repo)
 	h := NewHandler(svc)

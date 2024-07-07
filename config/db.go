@@ -1,19 +1,19 @@
 package config
 
 import (
-	"database/sql"
 	"log"
 	"time"
 
 	_ "github.com/jackc/pgconn"
 	_ "github.com/jackc/pgx/v4"
 	_ "github.com/jackc/pgx/v4/stdlib"
+	"github.com/jmoiron/sqlx"
 	"github.com/spf13/viper"
 )
 
-var db *sql.DB
+var db *sqlx.DB
 
-func GetDB() *sql.DB {
+func GetDB() *sqlx.DB {
 	return db
 }
 
@@ -26,7 +26,7 @@ func InitDB() {
 	db = conn
 }
 
-func connectToDb() *sql.DB {
+func connectToDb() *sqlx.DB {
 	counts := 0
 
 	dsn := viper.GetString("DSN")
@@ -53,8 +53,8 @@ func connectToDb() *sql.DB {
 	}
 }
 
-func openDB(dsn string) (*sql.DB, error) {
-	db, err := sql.Open("pgx", dsn)
+func openDB(dsn string) (*sqlx.DB, error) {
+	db, err := sqlx.Open("pgx", dsn)
 	if err != nil {
 		return nil, err
 	}

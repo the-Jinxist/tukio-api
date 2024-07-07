@@ -2,9 +2,9 @@ package login
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 
+	"github.com/jmoiron/sqlx"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -15,10 +15,10 @@ type repo interface {
 }
 
 type LoginRepo struct {
-	db *sql.DB
+	db *sqlx.DB
 }
 
-func NewRepo(db *sql.DB) repo {
+func NewRepo(db *sqlx.DB) repo {
 	return LoginRepo{
 		db: db,
 	}
@@ -44,14 +44,7 @@ func (l LoginRepo) login(ctx context.Context, req loginrReq) (User, error) {
 	}
 
 	var user User
-	res, err = l.db.QueryContext(ctx, "select 1 from users where email = $1", req.Email)
-	if err != nil {
-		return User{}, err
-	}
-
-	res.Next()
-	defer res.Close()
-	err = res.Scan(&user)
+	err = l.db.GetContext(ctx, &user, "select * from users where email = $1", req.Email)
 	if err != nil {
 		return User{}, err
 	}
