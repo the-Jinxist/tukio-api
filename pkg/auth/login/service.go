@@ -2,10 +2,8 @@ package login
 
 import (
 	"context"
-	"log"
 	"time"
 
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/the-Jinxist/tukio-api/internal/token"
 )
 
@@ -30,15 +28,10 @@ func (l LoginService) login(ctx context.Context, req loginrReq) (string, error) 
 		return "", err
 	}
 
-	tokenStr := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id":  user.ID.String(),
-		"token_id": "auth",
-		"exp":      time.Now().Add(time.Minute * 5).Unix(),
-	})
-
-	str, err := tokenStr.SignedString(token.AUTH_TOKEN_SECRET)
+	str, err := token.GenerateJwt(
+		user.ID.String(), time.Now().Add(time.Hour*72), token.AUTH_TOKEN_SECRET, token.AUTH_TOKEN_TYPE)
 	if err != nil {
-		log.Printf("mailer error: %v", err)
+		return "", err
 	}
 
 	return str, nil

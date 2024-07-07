@@ -66,7 +66,7 @@ func VerifyCodeAuthenticator(next http.Handler) http.Handler {
 func Authenticator(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		tokenStr := strings.TrimPrefix("Bearer ", r.Header.Get("Authorization"))
+		tokenStr := strings.TrimPrefix(r.Header.Get("Authorization"), "Bearer ")
 		if tokenStr == "" {
 			rnd.JSON(w, http.StatusUnauthorized, pkg.GenericResponse{
 				Message: "you are unauthorized to access this endpoint",

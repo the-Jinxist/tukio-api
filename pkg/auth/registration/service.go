@@ -7,7 +7,6 @@ import (
 	"log"
 	"time"
 
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/the-Jinxist/tukio-api/internal/mailer"
 	"github.com/the-Jinxist/tukio-api/internal/token"
 	twofa "github.com/the-Jinxist/tukio-api/internal/two-fa"
@@ -44,13 +43,7 @@ func (r RegistrationService) registerUser(ctx context.Context, req registerUserR
 		return "", err
 	}
 
-	tokenStr := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id":  userID,
-		"token_id": "verify_otp",
-		"exp":      time.Now().Add(time.Minute * 5).Unix(),
-	})
-
-	str, err := tokenStr.SignedString(token.VERIFY_TOKEN_SECRET)
+	str, err := token.GenerateJwt(userID, time.Now().Add(time.Minute*5), token.VERIFY_TOKEN_SECRET, token.VERIFY_TOKEN_TYPE)
 	if err != nil {
 		log.Printf("mailer error: %v", err)
 	}
@@ -95,13 +88,7 @@ func (r RegistrationService) verifyCode(ctx context.Context, req verifyCodeReq) 
 
 	// load values into jwt claims and send to user
 
-	tokenStr := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id":  userID,
-		"token_id": "auth",
-		"exp":      time.Now().Add(time.Hour * 48),
-	})
-
-	str, err := tokenStr.SignedString(token.AUTH_TOKEN_SECRET)
+	str, err := token.GenerateJwt(userID, time.Now().Add(time.Hour*72), token.AUTH_TOKEN_SECRET, token.AUTH_TOKEN_TYPE)
 	if err != nil {
 		log.Printf("mailer error: %v", err)
 	}

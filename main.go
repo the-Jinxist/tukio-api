@@ -7,7 +7,9 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/spf13/viper"
 	"github.com/the-Jinxist/tukio-api/config"
+	"github.com/the-Jinxist/tukio-api/middleware"
 	"github.com/the-Jinxist/tukio-api/pkg/auth"
+	"github.com/the-Jinxist/tukio-api/pkg/me"
 )
 
 func main() {
@@ -17,6 +19,8 @@ func main() {
 
 	r := chi.NewRouter()
 	r.Mount("/auth", auth.Routes(db))
+
+	r.With(middleware.Authenticator).Mount("/me", me.Routes(db))
 
 	port := viper.GetString("PORT")
 	if port == "" {
