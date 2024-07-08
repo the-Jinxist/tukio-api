@@ -2,10 +2,10 @@
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS "users" (
   "id" uuid PRIMARY KEY,
-  "email" varchar,
-  "password" varchar,
-  "verified" boolean,
-  "created_at" timestamp
+  "email" varchar NOT NULL,
+  "password" varchar NOT NULL,
+  "verified" boolean NOT NULL,
+  "created_at" timestamp NOT NULL
 );
 
 CREATE UNIQUE INDEX idx_users_email ON users (email);
