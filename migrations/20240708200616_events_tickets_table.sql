@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS "events_ticket_categories" (
   "updated_at" timestamp NOT NULL,
 
   FOREIGN KEY ("event_id") REFERENCES "events" ("id")
-)
+);
 
 CREATE TABLE IF NOT EXISTS "user_tickets" (
   "id" uuid PRIMARY KEY,
@@ -40,11 +40,11 @@ CREATE TABLE IF NOT EXISTS "user_tickets" (
   "created_at" timestamp NOT NULL,
   "updated_at" timestamp NOT NULL,
 
-  FOREIGN KEY ("event_id") REFERENCES "events" ("id")
-  FOREIGN KEY ("user_id") REFERENCES "users" ("id")
+  FOREIGN KEY ("event_id") REFERENCES "events" ("id"),
+  FOREIGN KEY ("user_id") REFERENCES "users" ("id"),
   FOREIGN KEY ("category_id") REFERENCES "events_ticket_categories" ("id")
 
-)
+);
 -- +goose StatementEnd
 
 -- +goose Down
