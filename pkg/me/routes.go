@@ -16,6 +16,7 @@ func Routes(db *sqlx.DB) http.Handler {
 	r := chi.NewRouter()
 	r.Get("/", h.get)
 	r.Put("/", h.update)
+	r.Get("/profile/{user_id}", h.getUserProfile)
 
 	return r
 }

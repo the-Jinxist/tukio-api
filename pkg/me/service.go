@@ -10,6 +10,7 @@ var _ service = ProfileService{}
 
 type service interface {
 	get(ctx context.Context) (Profile, error)
+	getUserProfile(ctx context.Context, uid string) (Profile, error)
 	update(ctx context.Context, req updateProfileReq) error
 }
 
@@ -32,4 +33,9 @@ func (p ProfileService) get(ctx context.Context) (Profile, error) {
 func (p ProfileService) update(ctx context.Context, req updateProfileReq) error {
 	uid := middleware.GetUserID(ctx)
 	return p.repo.update(ctx, uid, req)
+}
+
+// getUserProfile implements service.
+func (p ProfileService) getUserProfile(ctx context.Context, uid string) (Profile, error) {
+	return p.repo.get(ctx, uid)
 }

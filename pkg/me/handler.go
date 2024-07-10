@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator/v10"
+	"github.com/gofrs/uuid"
 	"github.com/the-Jinxist/tukio-api/pkg"
 	"github.com/thedevsaddam/renderer"
 )
@@ -36,6 +38,35 @@ func (h handler) get(w http.ResponseWriter, r *http.Request) {
 
 	rnd.JSON(w, http.StatusOK, pkg.DataResponse{
 		Message: "profile retrieved successfully",
+		Status:  "success",
+		Data:    profile,
+	})
+
+}
+
+func (h handler) getUserProfile(w http.ResponseWriter, r *http.Request) {
+
+	userID := chi.URLParam(r, "user_id")
+	_, err := uuid.FromString(userID)
+	if err != nil {
+		rnd.JSON(w, http.StatusBadRequest, pkg.GenericResponse{
+			Message: "invalid user id",
+			Status:  "error",
+		})
+		return
+	}
+
+	profile, err := h.svc.getUserProfile(r.Context(), userID)
+	if err != nil {
+		rnd.JSON(w, http.StatusBadRequest, pkg.GenericResponse{
+			Message: "invalid request",
+			Status:  "error",
+		})
+		return
+	}
+
+	rnd.JSON(w, http.StatusOK, pkg.DataResponse{
+		Message: "user profile retrieved successfully",
 		Status:  "success",
 		Data:    profile,
 	})

@@ -1,3 +1,6 @@
 package events
 
-type queryParams struct{}
+type queryParams struct {
+	limit  int
+	cursor string
+}
