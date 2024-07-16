@@ -20,13 +20,14 @@ type Event struct {
 }
 
 type EventTicketCategory struct {
-	ID        uuid.UUID `json:"id" db:"id"`
-	EventID   uuid.UUID `json:"event_id" db:"event_id"`
-	Name      string    `json:"name" db:"name"`
-	Desc      string    `json:"desc" db:"desc"`
-	Price     float64   `json:"price" db:"price"`
-	CreatedAt time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
+	ID         uuid.UUID `json:"id" db:"id"`
+	EventID    uuid.UUID `json:"event_id" db:"event_id"`
+	Name       string    `json:"name" db:"name"`
+	Desc       string    `json:"desc" db:"desc"`
+	Price      float64   `json:"price" db:"price"`
+	SeatNumber int64     `json:"seat_number" db:"seat_number"`
+	CreatedAt  time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt  time.Time `json:"updated_at" db:"updated_at"`
 }
 
 type EventResponse struct {

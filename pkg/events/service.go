@@ -11,6 +11,8 @@ var _ service = EventsService{}
 type service interface {
 	rlist(ctx context.Context, params queryParams) ([]EventResponse, responseParams, error)
 	get(ctx context.Context, eid string) (EventResponse, error)
+	listUserEvents(ctx context.Context, params queryParams) ([]EventResponse, responseParams, error)
+	create(ctx context.Context, param createEventParams) error
 }
 
 type EventsService struct {
@@ -35,4 +37,16 @@ func (e EventsService) rlist(ctx context.Context, params queryParams) ([]EventRe
 
 	return e.repo.list(ctx, params)
 
+}
+
+// listUserEvents implements service.
+func (e EventsService) listUserEvents(ctx context.Context, params queryParams) ([]EventResponse, responseParams, error) {
+	userID := middleware.GetUserID(ctx)
+	return e.repo.listUserEvents(ctx, userID, params)
+}
+
+// create implements service.
+func (e EventsService) create(ctx context.Context, param createEventParams) error {
+	userID := middleware.GetUserID(ctx)
+	return e.repo.create(ctx, userID, param)
 }

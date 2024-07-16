@@ -5,6 +5,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/jmoiron/sqlx"
+	"github.com/the-Jinxist/tukio-api/middleware"
 )
 
 func Routes(db *sqlx.DB) http.Handler {
@@ -16,6 +17,9 @@ func Routes(db *sqlx.DB) http.Handler {
 
 	r.Get("/", h.list)
 	r.Get("/{event_id}", h.get)
+
+	r.With(middleware.Authenticator).Get("/your-events", h.listUserEvents)
+	r.With(middleware.Authenticator).Post("/create", h.create)
 
 	return r
 }

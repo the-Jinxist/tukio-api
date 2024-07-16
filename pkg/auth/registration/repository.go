@@ -43,14 +43,16 @@ func (r RegistrationRepo) registerUser(ctx context.Context, req registerUserReq)
 	}
 
 	userID := uuid.Must(uuid.NewV7())
-	err = tx.QueryRow(`insert into users (id, email, password, verified, created_at) values ($1, $2, $3, false, now()) returning id`, userID, req.Email, hashedPassword).Scan(&userID)
+	err = tx.QueryRow(`insert into users (id, email, password, verified, created_at) values ($1, $2, $3, false, now()) returning id`,
+		userID, req.Email, hashedPassword).Scan(&userID)
 	if err != nil {
 		return "", err
 	}
 
 	pID := uuid.Must(uuid.NewV7())
 	_, err = tx.Exec(`insert into profiles (id, user_id, first_name, last_name, phone_number, created_at, updated_at)
-		values ($1, $2, $3, $4, $5, now(), now())`, pID, userID, req.FirstName, req.LastName, req.PhoneNumber)
+		values ($1, $2, $3, $4, $5, now(), now())`,
+		pID, userID, req.FirstName, req.LastName, req.PhoneNumber)
 	if err != nil {
 		return "", err
 	}
