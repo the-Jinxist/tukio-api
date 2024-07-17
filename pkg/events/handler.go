@@ -3,13 +3,20 @@ package events
 import (
 	"encoding/json"
 	"fmt"
+	"image"
+	"image/jpeg"
+	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"strconv"
+	"strings"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofrs/uuid"
+	"github.com/nfnt/resize"
+	"github.com/the-Jinxist/tukio-api/internal/media"
 	"github.com/the-Jinxist/tukio-api/pkg"
 	"github.com/thedevsaddam/renderer"
 )
@@ -136,6 +143,79 @@ func (h handler) create(w http.ResponseWriter, r *http.Request) {
 	rnd.JSON(w, http.StatusAccepted, pkg.GenericResponse{
 		Status:  "success",
 		Message: "Event created successfully!",
+	})
+}
+
+func (h handler) uploadImage(w http.ResponseWriter, r *http.Request) {
+	file, fH, err := r.FormFile("file")
+	if err != nil {
+		rnd.JSON(w, http.StatusBadRequest, pkg.GenericResponse{
+			Message: fmt.Sprintf("invalid request; %s", err.Error()),
+			Status:  "error",
+		})
+		return
+	}
+
+	img, _, err := image.Decode(file)
+	if err != nil {
+		log.Println(err)
+		rnd.JSON(w, http.StatusUnsupportedMediaType, pkg.GenericResponse{
+			Message: fmt.Sprintf("invalid request; %s", err.Error()),
+			Status:  "error",
+		})
+
+		return
+	}
+
+	fileExt := strings.Split(fH.Filename, ".")[1]
+	imageID := uuid.Must(uuid.NewV7())
+
+	fileName := fmt.Sprintf("%s.%s", imageID.String(), fileExt)
+
+	m := resize.Resize(1000, 0, img, resize.Lanczos3)
+	out, err := os.Create(fileName)
+	if err != nil {
+		rnd.JSON(w, http.StatusUnsupportedMediaType, pkg.GenericResponse{
+			Message: fmt.Sprintf("invalid request; %s", err.Error()),
+			Status:  "error",
+		})
+		return
+	}
+	defer out.Close()
+
+	err = jpeg.Encode(out, m, nil)
+	if err != nil {
+
+		rnd.JSON(w, http.StatusUnsupportedMediaType, pkg.GenericResponse{
+			Message: fmt.Sprintf("invalid request; %s", err.Error()),
+			Status:  "error",
+		})
+
+		return
+	}
+
+	meta := media.ImageMeta{
+		AssociatedID: imageID,
+		ImageType:    "event_poster",
+	}
+
+	imageUrl, err := media.UploadImage(r.Context(), fileName, meta)
+	if err != nil {
+
+		rnd.JSON(w, http.StatusUnsupportedMediaType, pkg.GenericResponse{
+			Message: fmt.Sprintf("invalid request; %s", err.Error()),
+			Status:  "error",
+		})
+
+		return
+	}
+
+	rnd.JSON(w, http.StatusUnsupportedMediaType, pkg.DataResponse{
+		Message: "image uploaded successfully",
+		Status:  "success",
+		Data: map[string]any{
+			"image_url": imageUrl,
+		},
 	})
 }
 

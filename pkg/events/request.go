@@ -10,11 +10,11 @@ type queryParams struct {
 type createEventParams struct {
 	Name             string            `json:"name" validate:"required,min=10"`
 	Desc             string            `json:"desc" validate:"required,min=20"`
-	Picture          string            `json:"picture" validate:"required"`
+	Picture          string            `json:"picture" validate:"required,url"`
 	Location         string            `json:"location" validate:"required"`
-	DressCode        string            `json:"dress_code" validate:"required"`
-	EventTime        time.Time         `json:"event_time" validate:"required,datetime"`
-	TicketCategories []*ticketCategory `json:"ticket_categories" validate:"required,dive,required"`
+	DressCode        string            `json:"dress_code"`
+	EventTime        time.Time         `json:"event_time" validate:"required"`
+	TicketCategories []*ticketCategory `json:"ticket_categories" validate:"dive,required"`
 }
 
 type ticketCategory struct {

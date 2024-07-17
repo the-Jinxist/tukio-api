@@ -5,26 +5,35 @@ import (
 )
 
 const (
-	EnvKey          = "ENVIRONMENT"
-	DbDriverKey     = "DB_DRIVER"
-	DbSourceKey     = "DB_SOURCE"
-	FromEmailKey    = "FROM_EMAIL"
-	FromPasswordKey = "FROM_PASSWORD"
+	EnvKey              = "ENVIRONMENT"
+	DbDriverKey         = "DB_DRIVER"
+	DbSourceKey         = "DB_SOURCE"
+	FromEmailKey        = "FROM_EMAIL"
+	FromPasswordKey     = "FROM_PASSWORD"
+	CloudinarySecretKey = "CLOUDINARY_API_KEY"
+	CloudinaryAPIKey    = "CLOUDINARY_SECRET"
 )
 
 type Config struct {
-	Environment   string `mapstructure:"ENVIRONMENT"`
-	DBDriver      string `mapstructure:"DB_DRIVER"`
-	DBSource      string `mapstructure:"DB_SOURCE"`
-	EmailFrom     string `mapstructure:"FROM_EMAIL"`
-	EmailPassword string `mapstructure:"FROM_PASSWORD"`
+	Environment      string `mapstructure:"ENVIRONMENT"`
+	DBDriver         string `mapstructure:"DB_DRIVER"`
+	DBSource         string `mapstructure:"DB_SOURCE"`
+	EmailFrom        string `mapstructure:"FROM_EMAIL"`
+	EmailPassword    string `mapstructure:"FROM_PASSWORD"`
+	CloudinaryAPIKey string `mapstructure:"CLOUDINARY_API_KEY"`
+	CloudinarySecret string `mapstructure:"CLOUDINARY_SECRET"`
+}
+
+var config Config
+
+func GetCurrentConfig() Config {
+	return config
 }
 
 func LoadConfigs(path string) (Config, error) {
 
 	var (
-		err    error
-		config Config
+		err error
 	)
 
 	viper.AddConfigPath(path)
@@ -52,6 +61,8 @@ func LoadConfigs(path string) (Config, error) {
 		config.DBSource = viper.GetString(DbSourceKey)
 		config.EmailFrom = viper.GetString(FromEmailKey)
 		config.EmailPassword = viper.GetString(FromPasswordKey)
+		config.CloudinaryAPIKey = viper.GetString(CloudinaryAPIKey)
+		config.CloudinarySecret = viper.GetString(CloudinarySecretKey)
 
 		return config, err
 

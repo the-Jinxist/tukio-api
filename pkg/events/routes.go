@@ -19,7 +19,8 @@ func Routes(db *sqlx.DB) http.Handler {
 	r.Get("/{event_id}", h.get)
 
 	r.With(middleware.Authenticator).Get("/your-events", h.listUserEvents)
-	r.With(middleware.Authenticator).Post("/create", h.create)
+	r.With(middleware.Authenticator).Post("/", h.create)
+	r.With(middleware.Authenticator).Post("/upload", h.uploadImage)
 
 	return r
 }

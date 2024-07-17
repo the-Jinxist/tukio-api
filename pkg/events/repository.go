@@ -125,6 +125,7 @@ func (e EventsRepo) create(ctx context.Context, userID string, param createEvent
 	defer tx.Rollback()
 
 	eventID := uuid.Must(uuid.NewV7())
+
 	event := Event{
 		Name:      param.Name,
 		Desc:      param.Desc,
@@ -134,7 +135,7 @@ func (e EventsRepo) create(ctx context.Context, userID string, param createEvent
 		EventTime: param.EventTime,
 	}
 
-	_, err = tx.Exec(`insert into events (id, user_id, name, desc, picture, location, dress_code, event_time, created_at, updated_at)
+	_, err = tx.Exec(`insert into events (id, user_id, name, "desc", picture, location, dress_code, event_time, created_at, updated_at)
 		values ($1, $2, $3, $4, $5, $6, $7, $8, now(), now())`,
 		eventID, userID, event.Name, event.Desc, event.Picture, event.Location, event.DressCode, event.EventTime)
 	if err != nil {
@@ -162,8 +163,8 @@ func insertTicketCategory(tx *sql.Tx, eventID uuid.UUID, ticketCategory []*ticke
 			SeatNumber: cats.SeatNumber,
 		}
 
-		_, err := tx.Exec(`insert into events_ticket_categories (id, name, desc, price, event_id, seat_number, created_at, updated_at)
-		values ($1, $2, $3, $4, $5, $6, now(), now())`, cate.ID, cate.EventID, cate.Name, cate.Desc, cate.Price, cate.SeatNumber)
+		_, err := tx.Exec(`insert into events_ticket_categories (id, name, "desc", price, event_id, seat_number, created_at, updated_at)
+		values ($1, $2, $3, $4, $5, $6, now(), now())`, cate.ID, cate.Name, cate.Desc, cate.Price, cate.EventID, cate.SeatNumber)
 		if err != nil {
 			return err
 		}
