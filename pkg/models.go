@@ -10,3 +10,7 @@ type DataResponse struct {
 	Status  string      `json:"status"`
 	Data    interface{} `json:"data"`
 }
+
+type ResponseParams struct {
+	NextCursor string `json:"next_cursor"`
+}

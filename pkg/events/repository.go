@@ -8,6 +8,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/gofrs/uuid"
 	"github.com/jmoiron/sqlx"
+	"github.com/the-Jinxist/tukio-api/pkg"
 )
 
 var (
@@ -17,8 +18,8 @@ var (
 )
 
 type repo interface {
-	list(ctx context.Context, params queryParams) ([]EventResponse, responseParams, error)
-	listUserEvents(ctx context.Context, uid string, params queryParams) ([]EventResponse, responseParams, error)
+	list(ctx context.Context, params queryParams) ([]EventResponse, *pkg.ResponseParams, error)
+	listUserEvents(ctx context.Context, uid string, params queryParams) ([]EventResponse, *pkg.ResponseParams, error)
 	get(ctx context.Context, eid string) (EventResponse, error)
 	create(ctx context.Context, userID string, param createEventParams) error
 }
@@ -34,9 +35,9 @@ func NewRepo(db *sqlx.DB) repo {
 }
 
 // list implements repo.
-func (e EventsRepo) list(ctx context.Context, params queryParams) ([]EventResponse, responseParams, error) {
+func (e EventsRepo) list(ctx context.Context, params queryParams) ([]EventResponse, *pkg.ResponseParams, error) {
 	q := psql.Select("events.*, (profiles.first_name || profiles.last_name) as poster_name").
-		From("events").Join("profiles on profiles.user_id on events.user_id").
+		From("events").Join("profiles on profiles.user_id = events.user_id").
 		OrderBy("events.created_at desc").Limit(uint64(params.limit))
 
 	id, _ := base64.StdEncoding.DecodeString(params.cursor)
@@ -48,30 +49,30 @@ func (e EventsRepo) list(ctx context.Context, params queryParams) ([]EventRespon
 
 	query, args, err := q.ToSql()
 	if err != nil {
-		return nil, responseParams{}, err
+		return nil, nil, err
 	}
 
 	var res []EventResponse
 	err = e.db.SelectContext(ctx, &res, query, args...)
 	if err != nil {
-		return nil, responseParams{}, err
+		return nil, nil, err
 	}
 
 	if len(res) == 0 {
-		return res, responseParams{}, nil
+		return res, nil, nil
 	}
 
 	lastEvent := res[len(res)-1]
-	var resParams responseParams
-	resParams.nextCursor = base64.StdEncoding.EncodeToString([]byte(lastEvent.ID.String()))
+	resParams := &pkg.ResponseParams{}
+	resParams.NextCursor = base64.StdEncoding.EncodeToString([]byte(lastEvent.ID.String()))
 
 	return res, resParams, nil
 
 }
 
-func (e EventsRepo) listUserEvents(ctx context.Context, uid string, params queryParams) ([]EventResponse, responseParams, error) {
+func (e EventsRepo) listUserEvents(ctx context.Context, uid string, params queryParams) ([]EventResponse, *pkg.ResponseParams, error) {
 	q := psql.Select("events.*, (profiles.first_name || profiles.last_name) as poster_name").
-		From("events").Join("profiles on profiles.user_id on events.user_id").
+		From("events").Join("profiles on profiles.user_id = events.user_id").
 		Where(sq.Eq{"events.user_id": uid}).
 		OrderBy("events.created_at desc").Limit(uint64(params.limit))
 
@@ -84,22 +85,22 @@ func (e EventsRepo) listUserEvents(ctx context.Context, uid string, params query
 
 	query, args, err := q.ToSql()
 	if err != nil {
-		return nil, responseParams{}, err
+		return nil, nil, err
 	}
 
 	var res []EventResponse
 	err = e.db.SelectContext(ctx, &res, query, args...)
 	if err != nil {
-		return nil, responseParams{}, err
+		return nil, nil, err
 	}
 
 	if len(res) == 0 {
-		return res, responseParams{}, nil
+		return res, nil, nil
 	}
 
 	lastEvent := res[len(res)-1]
-	var resParams responseParams
-	resParams.nextCursor = base64.StdEncoding.EncodeToString([]byte(lastEvent.ID.String()))
+	resParams := &pkg.ResponseParams{}
+	resParams.NextCursor = base64.StdEncoding.EncodeToString([]byte(lastEvent.ID.String()))
 
 	return res, resParams, nil
 
@@ -110,7 +111,7 @@ func (e EventsRepo) get(ctx context.Context, eid string) (EventResponse, error) 
 	var event EventResponse
 	err := e.db.GetContext(ctx, &event,
 		`select events.*, (profiles.first_name || profiles.last_name) as
-		 poster_name from events join profiles on profiles.user_id on events.user_id where events.id = $1`, eid)
+		 poster_name from events join profiles on profiles.user_id = events.user_id where events.id = $1`, eid)
 
 	return event, err
 }

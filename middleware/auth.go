@@ -103,5 +103,9 @@ func Authenticator(next http.Handler) http.Handler {
 }
 
 func GetUserID(ctx context.Context) string {
-	return ctx.Value(HeaderValue("uID")).(string)
+	val := ctx.Value(HeaderValue("uID"))
+	if val != nil {
+		return val.(string)
+	}
+	return ""
 }

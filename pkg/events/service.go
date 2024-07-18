@@ -4,14 +4,15 @@ import (
 	"context"
 
 	"github.com/the-Jinxist/tukio-api/middleware"
+	"github.com/the-Jinxist/tukio-api/pkg"
 )
 
 var _ service = EventsService{}
 
 type service interface {
-	rlist(ctx context.Context, params queryParams) ([]EventResponse, responseParams, error)
+	rlist(ctx context.Context, params queryParams) ([]EventResponse, *pkg.ResponseParams, error)
 	get(ctx context.Context, eid string) (EventResponse, error)
-	listUserEvents(ctx context.Context, params queryParams) ([]EventResponse, responseParams, error)
+	listUserEvents(ctx context.Context, params queryParams) ([]EventResponse, *pkg.ResponseParams, error)
 	create(ctx context.Context, param createEventParams) error
 }
 
@@ -29,7 +30,7 @@ func (e EventsService) get(ctx context.Context, eid string) (EventResponse, erro
 }
 
 // rlist implements service.
-func (e EventsService) rlist(ctx context.Context, params queryParams) ([]EventResponse, responseParams, error) {
+func (e EventsService) rlist(ctx context.Context, params queryParams) ([]EventResponse, *pkg.ResponseParams, error) {
 	if middleware.GetUserID(ctx) == "" {
 		params.limit = 5
 		params.cursor = ""
@@ -40,7 +41,7 @@ func (e EventsService) rlist(ctx context.Context, params queryParams) ([]EventRe
 }
 
 // listUserEvents implements service.
-func (e EventsService) listUserEvents(ctx context.Context, params queryParams) ([]EventResponse, responseParams, error) {
+func (e EventsService) listUserEvents(ctx context.Context, params queryParams) ([]EventResponse, *pkg.ResponseParams, error) {
 	userID := middleware.GetUserID(ctx)
 	return e.repo.listUserEvents(ctx, userID, params)
 }
