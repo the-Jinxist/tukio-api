@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/base64"
+	"time"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/gofrs/uuid"
@@ -14,7 +15,8 @@ import (
 var (
 	_ repo = EventsRepo{}
 
-	psql = sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
+	psql   = sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
+	layout = "2006-01-02 15:04:05.999999 -0700 MST"
 )
 
 type repo interface {
@@ -36,15 +38,16 @@ func NewRepo(db *sqlx.DB) repo {
 
 // list implements repo.
 func (e EventsRepo) list(ctx context.Context, params queryParams) ([]EventResponse, *pkg.ResponseParams, error) {
-	q := psql.Select("events.*, (profiles.first_name || profiles.last_name) as poster_name").
+	q := psql.Select("events.*, (profiles.first_name || ' ' || profiles.last_name) as poster_name").
 		From("events").Join("profiles on profiles.user_id = events.user_id").
 		OrderBy("events.created_at desc").Limit(uint64(params.limit))
 
 	id, _ := base64.StdEncoding.DecodeString(params.cursor)
-	eventID := string(id)
+	eventTime := string(id)
 
-	if eventID != "" {
-		q = q.Where(sq.Gt{"events.id": eventID})
+	if eventTime != "" {
+		eTime, _ := time.Parse(layout, eventTime)
+		q = q.Where(sq.Lt{"events.created_at": eTime})
 	}
 
 	query, args, err := q.ToSql()
@@ -64,23 +67,24 @@ func (e EventsRepo) list(ctx context.Context, params queryParams) ([]EventRespon
 
 	lastEvent := res[len(res)-1]
 	resParams := &pkg.ResponseParams{}
-	resParams.NextCursor = base64.StdEncoding.EncodeToString([]byte(lastEvent.ID.String()))
+	resParams.NextCursor = base64.StdEncoding.EncodeToString([]byte(lastEvent.CreatedAt.String()))
 
 	return res, resParams, nil
 
 }
 
 func (e EventsRepo) listUserEvents(ctx context.Context, uid string, params queryParams) ([]EventResponse, *pkg.ResponseParams, error) {
-	q := psql.Select("events.*, (profiles.first_name || profiles.last_name) as poster_name").
+	q := psql.Select("events.*, (profiles.first_name || ' ' || profiles.last_name) as poster_name").
 		From("events").Join("profiles on profiles.user_id = events.user_id").
 		Where(sq.Eq{"events.user_id": uid}).
 		OrderBy("events.created_at desc").Limit(uint64(params.limit))
 
 	id, _ := base64.StdEncoding.DecodeString(params.cursor)
-	eventID := string(id)
+	eventTime := string(id)
 
-	if eventID != "" {
-		q = q.Where(sq.Gt{"events.id": eventID})
+	if eventTime != "" {
+		eTime, _ := time.Parse(layout, eventTime)
+		q = q.Where(sq.Lt{"events.created_at": eTime})
 	}
 
 	query, args, err := q.ToSql()
@@ -100,7 +104,7 @@ func (e EventsRepo) listUserEvents(ctx context.Context, uid string, params query
 
 	lastEvent := res[len(res)-1]
 	resParams := &pkg.ResponseParams{}
-	resParams.NextCursor = base64.StdEncoding.EncodeToString([]byte(lastEvent.ID.String()))
+	resParams.NextCursor = base64.StdEncoding.EncodeToString([]byte(lastEvent.CreatedAt.String()))
 
 	return res, resParams, nil
 

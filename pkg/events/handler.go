@@ -78,7 +78,7 @@ func (h handler) list(w http.ResponseWriter, r *http.Request) {
 		Message: "events retrieved successfully",
 		Status:  "success",
 		Data: map[string]any{
-			"events":     event,
+			"events":     append([]EventResponse{}, event...),
 			"pagination": responseParams,
 		},
 	})
@@ -103,7 +103,7 @@ func (h handler) listUserEvents(w http.ResponseWriter, r *http.Request) {
 		Message: "user events retrieved successfully",
 		Status:  "success",
 		Data: map[string]any{
-			"events":     event,
+			"events":     append([]EventResponse{}, event...),
 			"pagination": responseParams,
 		},
 	})

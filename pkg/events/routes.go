@@ -15,7 +15,9 @@ func Routes(db *sqlx.DB) http.Handler {
 
 	r := chi.NewRouter()
 
-	r.Get("/", h.list)
+	r.Get("/public", h.list)
+	r.With(middleware.Authenticator).Get("/", h.list)
+
 	r.Get("/{event_id}", h.get)
 
 	r.With(middleware.Authenticator).Get("/your-events", h.listUserEvents)
