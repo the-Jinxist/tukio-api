@@ -7,9 +7,7 @@ import (
 	"image/jpeg"
 	"log"
 	"net/http"
-	"net/url"
 	"os"
-	"strconv"
 	"strings"
 
 	"github.com/go-chi/chi/v5"
@@ -63,7 +61,7 @@ func (h handler) get(w http.ResponseWriter, r *http.Request) {
 func (h handler) list(w http.ResponseWriter, r *http.Request) {
 
 	q := r.URL.Query()
-	params := getQueryParams(q)
+	params := pkg.GetQueryParams(q)
 
 	event, responseParams, err := h.svc.rlist(r.Context(), params)
 	if err != nil {
@@ -88,7 +86,7 @@ func (h handler) list(w http.ResponseWriter, r *http.Request) {
 func (h handler) listUserEvents(w http.ResponseWriter, r *http.Request) {
 
 	q := r.URL.Query()
-	params := getQueryParams(q)
+	params := pkg.GetQueryParams(q)
 
 	event, responseParams, err := h.svc.listUserEvents(r.Context(), params)
 	if err != nil {
@@ -217,19 +215,4 @@ func (h handler) uploadImage(w http.ResponseWriter, r *http.Request) {
 			"image_url": imageUrl,
 		},
 	})
-}
-
-func getQueryParams(q url.Values) queryParams {
-	limitStr, cursor := q.Get("limit"), q.Get("cursor")
-
-	limit, _ := strconv.Atoi(limitStr)
-	if limit == 0 {
-		limit = 20
-	}
-
-	params := queryParams{
-		limit:  limit,
-		cursor: cursor,
-	}
-	return params
 }

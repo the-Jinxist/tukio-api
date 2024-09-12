@@ -20,8 +20,8 @@ var (
 )
 
 type repo interface {
-	list(ctx context.Context, params queryParams) ([]EventResponse, *pkg.ResponseParams, error)
-	listUserEvents(ctx context.Context, uid string, params queryParams) ([]EventResponse, *pkg.ResponseParams, error)
+	list(ctx context.Context, params pkg.QueryParams) ([]EventResponse, *pkg.ResponseParams, error)
+	listUserEvents(ctx context.Context, uid string, params pkg.QueryParams) ([]EventResponse, *pkg.ResponseParams, error)
 	get(ctx context.Context, eid string) (EventResponse, error)
 	create(ctx context.Context, userID string, param createEventParams) error
 }
@@ -37,12 +37,12 @@ func NewRepo(db *sqlx.DB) repo {
 }
 
 // list implements repo.
-func (e EventsRepo) list(ctx context.Context, params queryParams) ([]EventResponse, *pkg.ResponseParams, error) {
+func (e EventsRepo) list(ctx context.Context, params pkg.QueryParams) ([]EventResponse, *pkg.ResponseParams, error) {
 	q := psql.Select("events.*, (profiles.first_name || ' ' || profiles.last_name) as poster_name").
 		From("events").Join("profiles on profiles.user_id = events.user_id").
-		OrderBy("events.created_at desc").Limit(uint64(params.limit))
+		OrderBy("events.created_at desc").Limit(uint64(params.Limit))
 
-	id, _ := base64.StdEncoding.DecodeString(params.cursor)
+	id, _ := base64.StdEncoding.DecodeString(params.Cursor)
 	eventTime := string(id)
 
 	if eventTime != "" {
@@ -73,13 +73,14 @@ func (e EventsRepo) list(ctx context.Context, params queryParams) ([]EventRespon
 
 }
 
-func (e EventsRepo) listUserEvents(ctx context.Context, uid string, params queryParams) ([]EventResponse, *pkg.ResponseParams, error) {
+func (e EventsRepo) listUserEvents(ctx context.Context, uid string, params pkg.QueryParams) ([]EventResponse, *pkg.ResponseParams, error) {
 	q := psql.Select("events.*, (profiles.first_name || ' ' || profiles.last_name) as poster_name").
 		From("events").Join("profiles on profiles.user_id = events.user_id").
 		Where(sq.Eq{"events.user_id": uid}).
-		OrderBy("events.created_at desc").Limit(uint64(params.limit))
+		OrderBy("events.created_at desc").Limit(uint64(params.Limit))
 
-	id, _ := base64.StdEncoding.DecodeString(params.cursor)
+	//TODO: ADD this entire flow into pkg as an helper too
+	id, _ := base64.StdEncoding.DecodeString(params.Cursor)
 	eventTime := string(id)
 
 	if eventTime != "" {

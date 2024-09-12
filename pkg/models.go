@@ -14,3 +14,7 @@ type DataResponse struct {
 type ResponseParams struct {
 	NextCursor string `json:"next_cursor"`
 }
+type QueryParams struct {
+	Limit  int
+	Cursor string
+}
